@@ -1,3 +1,0 @@
-function run() {
-  return 'hi'
-}

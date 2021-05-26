@@ -2,9 +2,16 @@
 
 {% block content %}
     <h1>{% block title %} Sheets Scraper {% endblock %}</h1>
-    <form>
-        <label for="fname">Google Sheets URL:</label>
-        <input type="text" id="fname" name="fname"><br><br>
-        <button>Submit</button>
+    <form method="post">
+        <div class="form-group">
+            <label for="link">Link</label>
+            <input type="text" name="link"
+                   placeholder="Google Sheets Link" class="form-control"
+                   value="{{ request.form['link'] }}"></input>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
     </form>
 {% endblock %}
