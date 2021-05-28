@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, render_template, request, url_for, flash, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import guess
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'alphabetically'
@@ -16,6 +17,7 @@ def get_db_connection():
 def about():
     return render_template('about.html')
 
+#OAuth
 scope = ['https://spreadsheets.google.com/feeds']
 creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
 client = gspread.authorize(creds)
@@ -27,8 +29,7 @@ def index():
         if not link:
             flash('Link is required!')
         else:
-            wks = client.open_by_url(link)
-            print(wks)
+            getLinkValues(link)
             conn = get_db_connection()
             conn.execute('INSERT INTO links (link) VALUES (?)', (link,))
             conn.commit()
@@ -36,3 +37,20 @@ def index():
             return redirect(url_for('index'))
     return render_template('index.html')
 
+def getLinkValues(url):
+    wks = client.open_by_url(url)
+    column1 = wks.get_worksheet(0).col_values(1)
+    sheetLength = wks.get_worksheet(0).col_count
+    #Todo: Add option to select sheet to view
+        #Iterate from first column to size of columns
+    dataType = colTypeGuess(column1)
+
+#TODO(User): Add user login --> user can sign up and see their past sheets
+
+def colTypeGuess(column):
+    for cell in column:
+        cellType = guess.cellType(cell)
+        print(cellType, cell)
+
+
+#In the case of multiple data types, return error

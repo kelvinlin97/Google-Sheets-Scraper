@@ -12,9 +12,5 @@ cur.execute("INSERT INTO links (link) VALUES (?)",
             ('First Link',)
             )
 
-cur.execute("INSERT INTO links (link) VALUES (?)",
-            ('Second Link',)
-            )
-
 connection.commit()
 connection.close()
