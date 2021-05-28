@@ -27,10 +27,8 @@ def index():
         if not link:
             flash('Link is required!')
         else:
-            print(link)
-            # wks = client.open_by_url(link)
-            # val = wks.get_worksheet('A1').cell
-            # print(val)
+            wks = client.open_by_url(link)
+            print()
             conn = get_db_connection()
             conn.execute('INSERT INTO links (link) VALUES (?)', (link,))
             conn.commit()
