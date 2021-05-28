@@ -28,7 +28,7 @@ def index():
             flash('Link is required!')
         else:
             wks = client.open_by_url(link)
-            print()
+            print(wks)
             conn = get_db_connection()
             conn.execute('INSERT INTO links (link) VALUES (?)', (link,))
             conn.commit()
