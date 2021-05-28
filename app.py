@@ -40,12 +40,18 @@ def index():
 
 def getLinkValues(url):
     wks = client.open_by_url(url)
-    column1 = wks.get_worksheet(1).col_values(3)
+    columns = wks.get_worksheet(0)
     sheetLength = wks.get_worksheet(0).col_count
+
     #TODO: Add option to select sheet to view
-        #Iterate from first column to size of columns
-    dataType = colTypeGuess(column1)
-    print(dataType)
+
+    data = []
+
+    for i in range(1, sheetLength):
+        dataType = colTypeGuess(columns.col_values(i))
+        data.append(dataType)
+
+    print(data)
 
 #TODO(User): Add user login --> user can sign up and see their past sheets
 
@@ -54,7 +60,7 @@ def colTypeGuess(column):
     #Ignore label of column (first cell)
     for cell in column[1:]:
         cellType = guess.cellType(cell)
-        print(cellType, cell)
+        # print(cellType, cell)
         if cellType not in ('blank', None):
             count[cellType] = count.get(cellType, 0) + 1
 
@@ -64,13 +70,17 @@ def colTypeGuess(column):
     for cellCount in count:
        totalVTC += count[cellCount]
 
+    if not count:
+        return 'Column is empty!'
+
     maxKey = max(count, key=count.get)
     highestVal = max(count.values())
-
+    #In the case of multiple data types, return error
     if highestVal/totalVTC >= .95:
         return maxKey
     else:
         return 'Unable to type guess with certainty, most prevalent data type was: ' + maxKey
 
+#TODO: Create sheets assessment (table with each column and their datatype) and render on page
 
-#In the case of multiple data types, return error
+
