@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, url_for, flash, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import guess
+import operator
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'alphabetically'
@@ -39,18 +40,37 @@ def index():
 
 def getLinkValues(url):
     wks = client.open_by_url(url)
-    column1 = wks.get_worksheet(0).col_values(1)
+    column1 = wks.get_worksheet(1).col_values(3)
     sheetLength = wks.get_worksheet(0).col_count
-    #Todo: Add option to select sheet to view
+    #TODO: Add option to select sheet to view
         #Iterate from first column to size of columns
     dataType = colTypeGuess(column1)
+    print(dataType)
 
 #TODO(User): Add user login --> user can sign up and see their past sheets
 
 def colTypeGuess(column):
-    for cell in column:
+    count = {}
+    #Ignore label of column (first cell)
+    for cell in column[1:]:
         cellType = guess.cellType(cell)
         print(cellType, cell)
+        if cellType not in ('blank', None):
+            count[cellType] = count.get(cellType, 0) + 1
+
+    #If 95% of column values are one type, make a guess that column is that type. Otherwise, return error
+    totalVTC = 0
+
+    for cellCount in count:
+       totalVTC += count[cellCount]
+
+    maxKey = max(count, key=count.get)
+    highestVal = max(count.values())
+
+    if highestVal/totalVTC >= .95:
+        return maxKey
+    else:
+        return 'Unable to type guess with certainty, most prevalent data type was: ' + maxKey
 
 
 #In the case of multiple data types, return error
