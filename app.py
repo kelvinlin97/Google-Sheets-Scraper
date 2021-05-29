@@ -57,10 +57,6 @@ def getLinkValues(url):
     x, y = formatData(data[0])
     return x, y
 
-# def createBarGraph(x, y):
-#     fig = px.bar(x, y)
-#     fig.show()
-
 def createTable(columnHeaders, columnValues):
     columnNumber = 1
     formatAppearances = []
@@ -130,5 +126,11 @@ def colTypeGuess(column):
         return 'Unable to type guess with certainty, most prevalent data type was: ' + maxKey
 
 #TODO: Create sheets assessment (table with each column and their datatype) and render on page
+
+# -Deploy app
+# -Add user login (see past sheets)
+# -Get graph to show on click
+# 	-User has to select sheet of file to check, input
+# -Style page
 
 
