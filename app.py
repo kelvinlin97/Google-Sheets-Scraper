@@ -26,27 +26,27 @@ def about():
 ####OAuth####
 
 scope = ['https://spreadsheets.google.com/feeds']
-# creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
 
-# the json credentials stored as env variable
 json_str = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
-# project name
 gcp_project = os.environ.get('salty-woodland-35192')
 
-# generate json - if there are errors here remove newlines in .env
-json_data = json.loads(json_str)
-# the private_key needs to replace \n parsed as string literal with escaped newlines
-json_data['private_key'] = json_data['private_key'].replace('\\n', '\n')
-
-# use service_account to generate credentials object
-credentials = service_account.Credentials.from_service_account_info(
+#Deployment
+if json_str is not None:
+    json_data = json.loads(json_str)
+    json_data['private_key'] = json_data['private_key'].replace('\\n', '\n')
+    credentials = service_account.Credentials.from_service_account_info(
     json_data)
+#Development
+else:
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
+
 client = gspread.authorize(credentials)
 
 @app.route('/', methods=('GET', 'POST'))
 def index():
     if request.method == 'POST':
         link = request.form['link']
+        sheetNumber = request.form['sheet']
         if not link:
             flash('Link is required!')
         else:

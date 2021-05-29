@@ -9,6 +9,12 @@
                    placeholder="Google Sheets Link" class="form-control"
                    value="{{ request.form['link'] }}"></input>
         </div>
+        <div class="form-group">
+            <label for="sheet">Sheet # (Please specify which sheet in the link to analyze)</label>
+            <input type="text" name="sheet"
+                   placeholder="Sheet Number" class="form-control"
+                   value="{{ request.form['sheet'] }}"></input>
+        </div>
 
         <div class="form-group">
             <button type="submit" class="btn btn-primary">Submit</button>
