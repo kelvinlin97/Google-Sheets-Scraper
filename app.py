@@ -7,6 +7,8 @@ import guess
 import json
 import plotly.express as px
 import plotly.graph_objects as go
+from google.oauth2 import service_account
+import os
 
 
 app = Flask(__name__)
@@ -21,10 +23,25 @@ def get_db_connection():
 def about():
     return render_template('about.html')
 
-#OAuth
+####OAuth####
+
 scope = ['https://spreadsheets.google.com/feeds']
-creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
-client = gspread.authorize(creds)
+# creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
+
+# the json credentials stored as env variable
+json_str = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+# project name
+gcp_project = os.environ.get('salty-woodland-35192')
+
+# generate json - if there are errors here remove newlines in .env
+json_data = json.loads(json_str)
+# the private_key needs to replace \n parsed as string literal with escaped newlines
+json_data['private_key'] = json_data['private_key'].replace('\\n', '\n')
+
+# use service_account to generate credentials object
+credentials = service_account.Credentials.from_service_account_info(
+    json_data)
+client = gspread.authorize(credentials)
 
 @app.route('/', methods=('GET', 'POST'))
 def index():
