@@ -1,9 +1,10 @@
 import sqlite3
+import flask
 from flask import Flask, render_template, request, url_for, flash, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import guess
-import operator
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'alphabetically'
@@ -14,7 +15,7 @@ def get_db_connection():
     return conn
 
 #TODO(Bugfix): About page routing
-@app.route('/#')
+@app.route('/about')
 def about():
     return render_template('about.html')
 
@@ -35,8 +36,12 @@ def index():
             conn.execute('INSERT INTO links (link) VALUES (?)', (link,))
             conn.commit()
             conn.close()
-            return redirect(url_for('index'))
+            return redirect(url_for('showSheet'))
     return render_template('index.html')
+
+@app.route('/sheets')
+def showSheet():
+    return render_template('sheets.html')
 
 def getLinkValues(url):
     wks = client.open_by_url(url)
@@ -45,13 +50,31 @@ def getLinkValues(url):
 
     #TODO: Add option to select sheet to view
 
-    data = []
+    data = [[]]
 
     for i in range(1, sheetLength):
         dataType = colTypeGuess(columns.col_values(i))
-        data.append(dataType)
+        data[0].append(dataType)
 
-    print(data)
+    x, y = formatData(data[0])
+    return flask.jsonify({'payload':json.dumps({'data': y, 'labels': x})})
+
+
+def formatData(data):
+    formattedData = {}
+
+    for type in data:
+        if "Unable to type guess with certainty, most prevalent data type was:" in type:
+            type = type[67: len(type)]
+        if "Column is empty!" in type:
+            type = "Blank"
+        formattedData[type] = formattedData.get(type, 0) + 1
+
+    x = formattedData.keys()
+    y = formattedData.values()
+
+    return list(x), list(y)
+
 
 #TODO(User): Add user login --> user can sign up and see their past sheets
 
@@ -60,9 +83,11 @@ def colTypeGuess(column):
     #Ignore label of column (first cell)
     for cell in column[1:]:
         cellType = guess.cellType(cell)
-        # print(cellType, cell)
         if cellType not in ('blank', None):
             count[cellType] = count.get(cellType, 0) + 1
+
+    if not count:
+        return 'Column is empty!'
 
     #If 95% of column values are one type, make a guess that column is that type. Otherwise, return error
     totalVTC = 0
@@ -70,8 +95,6 @@ def colTypeGuess(column):
     for cellCount in count:
        totalVTC += count[cellCount]
 
-    if not count:
-        return 'Column is empty!'
 
     maxKey = max(count, key=count.get)
     highestVal = max(count.values())
