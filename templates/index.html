@@ -2,6 +2,15 @@
 
 {% block content %}
     <h1>{% block title %} Sheets Scraper {% endblock %}</h1>
+    {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <h4 class="text-danger">{{ message }}</h4>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
     <form method="post">
         <div class="form-group">
             <label for="link">Link</label>
@@ -10,7 +19,7 @@
                    value="{{ request.form['link'] }}"></input>
         </div>
         <div class="form-group">
-            <label for="sheet">Sheet # (Please specify which sheet in the link to analyze)</label>
+            <label for="sheet">Sheet # (Please specify which sheet (zero-indexed) in the link to analyze)</label>
             <input type="text" name="sheet"
                    placeholder="Sheet Number" class="form-control"
                    value="{{ request.form['sheet'] }}"></input>

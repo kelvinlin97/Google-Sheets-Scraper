@@ -47,32 +47,38 @@ def index():
     if request.method == 'POST':
         link = request.form['link']
         sheetNumber = request.form['sheet']
+        if not sheetNumber:
+            flash('Error: Sheet number must be entered')
         if not link:
-            flash('Link is required!')
+            flash('Error: Link is required!')
         else:
-            x, y = getLinkValues(link)
-            # createBarGraph(x, y)
+            getLinkValues(link, sheetNumber)
             conn = get_db_connection()
             conn.execute('INSERT INTO links (link) VALUES (?)', (link,))
             conn.commit()
             conn.close()
     return render_template('index.html')
 
-def getLinkValues(url):
+def getLinkValues(url, sheetNum):
+    sheetNum = int(sheetNum)
     wks = client.open_by_url(url)
-    columns = wks.get_worksheet(0)
-    sheetLength = wks.get_worksheet(0).col_count
+    columns = wks.get_worksheet(sheetNum)
+
+    if not columns:
+         flash('Error: Sheet number entered was out of range')
+    else:
+        sheetLength = wks.get_worksheet(sheetNum).col_count
 
     #TODO: Add option to select sheet to view
 
-    data = [[]]
+        data = [[]]
 
-    for i in range(1, sheetLength):
-        dataType = colTypeGuess(columns.col_values(i))
-        data[0].append(dataType)
+        for i in range(1, sheetLength):
+            dataType = colTypeGuess(columns.col_values(i))
+            data[0].append(dataType)
 
-    x, y = formatData(data[0])
-    return x, y
+        x, y = formatData(data[0])
+        return x, y
 
 def createTable(columnHeaders, columnValues):
     columnNumber = 1
