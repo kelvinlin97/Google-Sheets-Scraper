@@ -1,1 +1,1 @@
-web: gunicorn app:sheetsScraper
+web: gunicorn app.py
