@@ -15,6 +15,7 @@ You can check out our application at
 # Technologies
 
 Frontend: Plotly, Bootstrap 
+
 Backend: Flask, gsheets
 
 
