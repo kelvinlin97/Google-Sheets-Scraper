@@ -1,10 +1,13 @@
+from os import link
 import sqlite3
-import flask
 from flask import Flask, render_template, request, url_for, flash, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import guess
 import json
+import plotly.express as px
+import plotly.graph_objects as go
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'alphabetically'
@@ -14,7 +17,6 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-#TODO(Bugfix): About page routing
 @app.route('/about')
 def about():
     return render_template('about.html')
@@ -31,17 +33,13 @@ def index():
         if not link:
             flash('Link is required!')
         else:
-            getLinkValues(link)
+            x, y = getLinkValues(link)
+            # createBarGraph(x, y)
             conn = get_db_connection()
             conn.execute('INSERT INTO links (link) VALUES (?)', (link,))
             conn.commit()
             conn.close()
-            return redirect(url_for('showSheet'))
     return render_template('index.html')
-
-@app.route('/sheets')
-def showSheet():
-    return render_template('sheets.html')
 
 def getLinkValues(url):
     wks = client.open_by_url(url)
@@ -57,10 +55,37 @@ def getLinkValues(url):
         data[0].append(dataType)
 
     x, y = formatData(data[0])
-    return flask.jsonify({'payload':json.dumps({'data': y, 'labels': x})})
+    return x, y
 
+# def createBarGraph(x, y):
+#     fig = px.bar(x, y)
+#     fig.show()
+
+def createTable(columnHeaders, columnValues):
+    columnNumber = 1
+    formatAppearances = []
+    for columnValue in columnValues:
+        formattedHeader = excelFormat(columnNumber)
+        columnHeaders.append('Column ' + formattedHeader)
+        formatAppearances.append([columnValue])
+        columnNumber += 1
+
+    fig = go.Figure(data=[go.Table(header=dict(values=columnHeaders),
+                 cells=dict(values=formatAppearances))
+                     ])
+    fig.show()
+
+def excelFormat(n):
+    abc="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    ans=""
+    while n:
+        n=n-1
+        ans=abc[n%26]+ans
+        n=n//26
+    return ans
 
 def formatData(data):
+    createTable([], data)
     formattedData = {}
 
     for type in data:
