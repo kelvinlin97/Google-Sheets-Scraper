@@ -4,13 +4,14 @@ A google sheets scraper built for DataRobot. Given a link to a publicly availabl
 
 # Demo
 
-You can check out our application at 
+You can check out our application at: https://salty-woodland-35192.herokuapp.com/
 
 # Setup
 
 1. Fork and clone this repo.
-2. flask run
-3. Get scraping!
+2. Install dependencies: pip install -r requirement.txt
+3. flask run
+4. Get scraping!
 
 # Technologies
 
