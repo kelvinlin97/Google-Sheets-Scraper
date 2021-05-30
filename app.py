@@ -32,15 +32,17 @@ gcp_project = os.environ.get('salty-woodland-35192')
 
 #Deployment
 if json_str is not None:
+    print(json_str)
     json_data = json.loads(json_str)
     json_data['private_key'] = json_data['private_key'].replace('\\n', '\n')
     credentials = service_account.Credentials.from_service_account_info(
     json_data)
+    client = gspread.authorize(credentials, gcp_project)
+
 #Development
 else:
     credentials = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
-
-client = gspread.authorize(credentials)
+    client = gspread.authorize(credentials)
 
 @app.route('/', methods=('GET', 'POST'))
 def index():
