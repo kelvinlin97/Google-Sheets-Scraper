@@ -47,10 +47,10 @@ def index():
     if request.method == 'POST':
         link = request.form['link']
         sheetNumber = request.form['sheet']
-        if not sheetNumber:
-            flash('Error: Sheet number must be entered')
         if not link:
             flash('Error: Link is required!')
+        elif not sheetNumber:
+            flash('Error: Sheet number must be entered')
         else:
             getLinkValues(link, sheetNumber)
             conn = get_db_connection()
@@ -68,8 +68,6 @@ def getLinkValues(url, sheetNum):
          flash('Error: Sheet number entered was out of range')
     else:
         sheetLength = wks.get_worksheet(sheetNum).col_count
-
-    #TODO: Add option to select sheet to view
 
         data = [[]]
 
@@ -89,10 +87,11 @@ def createTable(columnHeaders, columnValues):
         formatAppearances.append([columnValue])
         columnNumber += 1
 
-    fig = go.Figure(data=[go.Table(header=dict(values=columnHeaders),
-                 cells=dict(values=formatAppearances))
-                     ])
+    fig = go.Figure(data=[go.Table(header=dict(values=columnHeaders), cells=dict(values=formatAppearances))])
+
     fig.show()
+
+    flash('Sheet data should have loaded in another page, to analyze another sheet change the sheet number!')
 
 def excelFormat(n):
     abc="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -119,9 +118,6 @@ def formatData(data):
 
     return list(x), list(y)
 
-
-#TODO(User): Add user login --> user can sign up and see their past sheets
-
 def colTypeGuess(column):
     count = {}
     #Ignore label of column (first cell)
@@ -147,13 +143,5 @@ def colTypeGuess(column):
         return maxKey
     else:
         return 'Unable to type guess with certainty, most prevalent data type was: ' + maxKey
-
-#TODO: Create sheets assessment (table with each column and their datatype) and render on page
-
-# -Deploy app
-# -Add user login (see past sheets)
-# -Get graph to show on click
-# 	-User has to select sheet of file to check, input
-# -Style page
 
 
