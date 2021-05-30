@@ -10,7 +10,7 @@ Note: Tables are currently not appearing in deployed version.
 # Setup
 
 1. Fork and clone this repo.
-2. Install dependencies: pip install -r requirement.txt
+2. Install dependencies: pip install -r requirements.txt
 3. flask run
 4. Get scraping!
 
