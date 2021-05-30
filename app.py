@@ -33,7 +33,7 @@ gcp_project = os.environ.get('salty-woodland-35192')
 #Deployment
 if json_str is not None:
     json_data = json.loads(json_str)
-    json_data['private_key'] = json_data['private_key'].replace('\\n', '\n')
+    # json_data['private_key'] = json_data['private_key'].replace('\\n', '\n')
     credentials = ServiceAccountCredentials.from_json(json_data)
 
 #Development
