@@ -5,6 +5,7 @@ A google sheets scraper built for DataRobot. Given a link to a publicly availabl
 # Demo
 
 You can check out our application at: https://salty-woodland-35192.herokuapp.com/
+Note: Tables are currently not appearing in deployed version.
 
 # Setup
 
